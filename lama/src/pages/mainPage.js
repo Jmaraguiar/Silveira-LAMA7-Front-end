@@ -1,3 +1,5 @@
+import axios from "axios"
+import { useEffect, useState } from "react"
 import styled from "styled-components"
 import img from "../assets/MainPageBackground.png"
 
@@ -15,6 +17,9 @@ color: white;
 `
 
 const SectionContainer = styled.header`
+display: flex;
+justify-content: center;
+align-items: center;
 background-image: url(${img});
 background-repeat: no-repeat;
 background-size: cover;
@@ -29,6 +34,59 @@ align-items: center;
 justify-content: center;
 background-color: black;
 color: white;
+`
+
+const Display = styled.div`
+display: flex;
+align-items: center;
+justify-content: space-evenly;
+height: 400px;
+width: 800px;
+`
+
+const LeftArrow = styled.div`
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: black;
+border-radius: 100%;
+font-size: 30px;
+height: 50px;
+width: 50px;
+transition: font-size 0.1s;
+color: white;
+
+:hover{
+    font-size: 40px;
+}
+`
+
+const RightArrow = styled.div`
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: black;
+border-radius: 100%;
+font-size: 30px;
+height: 50px;
+width: 50px;
+transition: font-size 0.1s;
+color: white;
+
+:hover{
+    font-size: 40px;
+}
+`
+
+const Canvas = styled.div`
+overflow: hidden;
+border-radius: 10px;
+height: 100%;
+width: 600px;
+
+img{
+    height: 100%;
+}
 `
 
 const Logo = styled.div`
@@ -69,6 +127,55 @@ button{
 
 export function MainPage(props){
 
+    const [photos, setPhotos] = useState([])
+    const [photoNum, setPhotoNum] = useState(0)
+
+    const fowardPhoto = ()=> {
+        let number = photoNum + 1
+        if(photoNum >= (photos.length - 1)){
+            number = 0
+            setPhotoNum(number)
+        }else{
+            setPhotoNum(number)
+        }
+        console.log("foward foto")
+    }
+
+    const BackPhoto = ()=> {
+        let number = photoNum - 1
+        if(photoNum <= 0){
+            number = 0
+            setPhotoNum(number)
+        }else{
+            setPhotoNum(number)
+        }
+        console.log("back foto", number)
+    }
+
+    const getPhotos = ()=> {
+        let Headers = {
+            headers: {
+                'Access-Control-Allow-Credentials' : true,
+                'Access-Control-Allow-Methods':'GET',
+                'Access-Control-Allow-Headers':'application/json',
+                "Access-Control-Allow-Origin": "*",
+                'Content-Type': 'application/json',
+              },
+        }
+        axios.get("https://silveira-lama7.herokuapp.com/gallery/all",Headers)
+        .then(res => {
+            setPhotos(res.data)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+
+        }
+
+    useEffect(()=>{
+        getPhotos()
+    },[])
+
 
     return (
 
@@ -85,11 +192,21 @@ export function MainPage(props){
             </HeaderContainer>
 
             <SectionContainer>
-                
+                <Display>
+                    <LeftArrow onClick={BackPhoto}>
+                    <i class="fa-solid fa-chevron-left"/>
+                    </LeftArrow>
+                    <Canvas>
+                        <img src={`${photos[photoNum] && photos[photoNum].photo}`}/>
+                    </Canvas>
+                    <RightArrow onClick={fowardPhoto}>
+                    <i class="fa-solid fa-angle-right"/>
+                    </RightArrow>
+                </Display>
             </SectionContainer>
 
             <FooterContainer>
-                <h1>Footer</h1>
+                
             </FooterContainer>
 
         </MainPageContainer>
